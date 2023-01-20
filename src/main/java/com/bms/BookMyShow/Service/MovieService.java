@@ -52,8 +52,6 @@ public class MovieService {
         return "Successfully deleted the movie ";
     }
 
-    public String deleteMovieByName(String name) {
-        movieRepository.deleteByMovieName(name);
-        return "Successfully deleted the movie ";
-    }
+
+
 }

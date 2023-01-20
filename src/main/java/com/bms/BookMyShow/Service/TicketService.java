@@ -1,11 +1,14 @@
 package com.bms.BookMyShow.Service;
 
 import com.bms.BookMyShow.Dtos.BookTicketRequestDto;
+import com.bms.BookMyShow.Dtos.CancelTicketRequestDto;
+import com.bms.BookMyShow.Enums.TicketStatus;
 import com.bms.BookMyShow.Models.ShowEntity;
 import com.bms.BookMyShow.Models.ShowSeatEntity;
 import com.bms.BookMyShow.Models.TicketEntity;
 import com.bms.BookMyShow.Models.UserEntity;
 import com.bms.BookMyShow.Repository.ShowRepository;
+import com.bms.BookMyShow.Repository.ShowSeatRepository;
 import com.bms.BookMyShow.Repository.TicketRepository;
 import com.bms.BookMyShow.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ public class TicketService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ShowSeatRepository showSeatRepository;
 
     public String bookTicket(BookTicketRequestDto bookTicketRequestDto) throws Exception {
         List<String> requestedSeats = bookTicketRequestDto.getRequestSeats();
@@ -69,9 +75,36 @@ public class TicketService {
         ticketEntity.setUser(userEntity);
         ticketEntity.setBookedSeats(bookedSeats);
         ticketEntity.setAllotedSeats(allotedseats);
+        ticketEntity.setStatus(TicketStatus.ACTIVE);
 
         ticketRepository.save(ticketEntity);
 
         return "Tickets are successfully generated";
+    }
+
+    public String cancelTicket(CancelTicketRequestDto cancelTicketRequestDto) {
+      TicketEntity ticketEntity = ticketRepository.findById(cancelTicketRequestDto.getId()).get();
+      if(ticketEntity.getStatus().equals(TicketStatus.ACTIVE)) {
+          List<ShowSeatEntity> allotedSeats = ticketEntity.getBookedSeats();
+          int bookingAmount = ticketEntity.getAmount();
+          double amountAfterCancellation = bookingAmount * 0.8;
+
+          for (ShowSeatEntity seat : allotedSeats
+          ) {
+              seat.setBooked(false);
+              seat.setTicket(null);
+              seat.setBookedAt(null);
+              showSeatRepository.save(seat);
+          }
+
+          ticketEntity.setStatus(TicketStatus.CANCELLED);
+
+          ticketRepository.save(ticketEntity);
+
+
+          return "Your Tickets are cancelled successfully and " + amountAfterCancellation + " will be refunded to your source account";
+      }
+      else
+          return "Given ticket id is cancelled already";
     }
 }

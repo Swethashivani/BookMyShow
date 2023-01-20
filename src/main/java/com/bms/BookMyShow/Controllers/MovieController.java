@@ -39,11 +39,4 @@ public class MovieController {
         return new ResponseEntity<>(movieService.deleteMovie(id), HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteMovieByName")
-    public ResponseEntity<String> deleteMovieByName(String name){
-        return new ResponseEntity<>(movieService.deleteMovieByName(name), HttpStatus.OK);
-    }
-
-
-
 }

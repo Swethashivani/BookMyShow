@@ -1,8 +1,11 @@
 package com.bms.BookMyShow.Service;
 
 import com.bms.BookMyShow.Dtos.UserRequestDto;
+import com.bms.BookMyShow.Models.ShowEntity;
+import com.bms.BookMyShow.Models.TicketEntity;
 import com.bms.BookMyShow.Models.UserEntity;
 import com.bms.BookMyShow.Repository.UserRepository;
+import com.bms.BookMyShow.ResponseDtos.AllTicketsResponseDto;
 import com.bms.BookMyShow.ResponseDtos.UserResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,24 @@ public class UserService {
                .mobile(userEntity.getMobile()).build();
        return userResponseDto;
     }
+
+
+    public List<AllTicketsResponseDto> getAllTickets(int userId) {
+        UserEntity user = userRepository.findById(userId).get();
+        List<TicketEntity> ticketEntityList = user.getListOfTickets();
+        List<AllTicketsResponseDto> ticketsResponse = new ArrayList<>();
+        for (TicketEntity ticket: ticketEntityList) {
+            ShowEntity showEntity = ticket.getShow();
+            AllTicketsResponseDto allTicketsresponseDto = AllTicketsResponseDto.builder().MovieName(showEntity.getMovie().getMovieName())
+                    .bookedSeats(ticket.getAllotedSeats())
+                    .showTime(showEntity.getShowTime())
+                    .showDate(showEntity.getShowDate())
+                    .theatreName(showEntity.getTheatre().getName())
+                    .build();
+            ticketsResponse.add(allTicketsresponseDto);
+        }
+        return ticketsResponse;
+        }
 
 
 }

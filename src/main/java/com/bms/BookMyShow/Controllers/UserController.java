@@ -1,7 +1,7 @@
 package com.bms.BookMyShow.Controllers;
 
 import com.bms.BookMyShow.Dtos.UserRequestDto;
-import com.bms.BookMyShow.Models.UserEntity;
+import com.bms.BookMyShow.ResponseDtos.AllTicketsResponseDto;
 import com.bms.BookMyShow.ResponseDtos.UserResponseDto;
 import com.bms.BookMyShow.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,11 @@ public class UserController {
     @GetMapping("/name")
     public ResponseEntity<UserResponseDto> getUserByName(@RequestParam String name) {
         return new ResponseEntity<>(userService.getUserByName(name), HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllTickets")
+    public ResponseEntity<List<AllTicketsResponseDto>> getAllTickets(@RequestParam int userId){
+        return new ResponseEntity<>(userService.getAllTickets(userId), HttpStatus.OK);
     }
 
 }

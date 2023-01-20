@@ -1,6 +1,8 @@
 package com.bms.BookMyShow.Models;
 
 import javax.persistence.*;
+
+import com.bms.BookMyShow.Enums.TicketStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +24,10 @@ public class TicketEntity {
     private String allotedSeats;
     private int amount;
     private Date booked_at;
+
+
+    @Enumerated(value = EnumType.STRING)
+    private TicketStatus status;
     @ManyToOne
     @JoinColumn
     private UserEntity user;

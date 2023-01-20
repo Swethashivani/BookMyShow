@@ -2,10 +2,14 @@ package com.bms.BookMyShow.Service;
 
 import com.bms.BookMyShow.Dtos.TheatreRequestDto;
 import com.bms.BookMyShow.Enums.SeatType;
+import com.bms.BookMyShow.Models.MovieEntity;
+import com.bms.BookMyShow.Models.ShowEntity;
 import com.bms.BookMyShow.Models.TheatreEntity;
 import com.bms.BookMyShow.Models.TheatreSeatEntity;
+import com.bms.BookMyShow.Repository.MovieRepository;
 import com.bms.BookMyShow.Repository.TheatreRepository;
 import com.bms.BookMyShow.Repository.TheatreSeatRepository;
+import com.bms.BookMyShow.ResponseDtos.TheatreResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,9 @@ public class TheatreService {
     TheatreRepository theatreRepository;
     @Autowired
     TheatreSeatRepository theatreSeatRepository;
+
+    @Autowired
+    MovieRepository movieRepository;
 
     public String createTheatre(TheatreRequestDto theatreRequestDto) {
         TheatreEntity theatre = TheatreEntity.builder()
@@ -65,5 +72,20 @@ public class TheatreService {
 //        TheatreSeatEntity theatreSeat10 = new TheatreSeatEntity("2E", SeatType.PLATINUM, 200);
         theatreSeatRepository.saveAll(seats);
         return seats;
+    }
+
+    public List<TheatreResponseDto> getTheatreByMovie(String movieName) {
+        MovieEntity movie = movieRepository.findByMovieName(movieName);
+        List<ShowEntity> showEntityList = movie.getListOfShows();
+        List<TheatreResponseDto>  theatreResponseDtos = new ArrayList<>();
+        for (ShowEntity show : showEntityList
+        ) {
+            TheatreEntity theatre = show.getTheatre();
+            TheatreResponseDto theatreResponseDto = TheatreResponseDto.builder().name(theatre.getName()).city(theatre.getCity())
+                    .address(theatre.getAddress()).build();
+            if (!theatreResponseDtos.contains(theatreResponseDto))
+                theatreResponseDtos.add(theatreResponseDto);
+        }
+        return theatreResponseDtos;
     }
 }
